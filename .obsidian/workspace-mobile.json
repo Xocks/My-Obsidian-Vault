@@ -4,11 +4,11 @@
     "type": "split",
     "children": [
       {
-        "id": "b2003ced76740d18",
+        "id": "5c96d493df0b96af",
         "type": "tabs",
         "children": [
           {
-            "id": "e017551442c7f02b",
+            "id": "0cf2d508cdd8dfc4",
             "type": "leaf",
             "state": {
               "type": "empty",
@@ -108,7 +108,6 @@
         "state": {
           "type": "backlink",
           "state": {
-            "file": "日记/2026-03-11.md",
             "collapseAll": false,
             "extraContext": false,
             "sortOrder": "alphabetical",
@@ -163,8 +162,9 @@
       "obsidian-git:Open Git source control": false
     }
   },
-  "active": "e017551442c7f02b",
+  "active": "6eccc00223dd4fc7",
   "lastOpenFiles": [
+    "未命名.md",
     "未命名.canvas",
     "日记/2026-03-11.md",
     "试试ipad画画.md",
