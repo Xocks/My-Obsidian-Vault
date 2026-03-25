@@ -6,17 +6,32 @@
   "hideUnresolved": false,
   "showOrphans": true,
   "collapse-color-groups": true,
-  "colorGroups": [],
+  "colorGroups": [
+    {
+      "query": "file:刷题日记",
+      "color": {
+        "a": 1,
+        "rgb": 3077461
+      }
+    },
+    {
+      "query": "path:算法  ",
+      "color": {
+        "a": 1,
+        "rgb": 19711
+      }
+    }
+  ],
   "collapse-display": true,
   "showArrow": false,
   "textFadeMultiplier": 0,
-  "nodeSizeMultiplier": 1,
-  "lineSizeMultiplier": 1,
+  "nodeSizeMultiplier": 1.47475961538462,
+  "lineSizeMultiplier": 2.35375600961538,
   "collapse-forces": true,
-  "centerStrength": 0.518713248970312,
-  "repelStrength": 10,
-  "linkStrength": 1,
-  "linkDistance": 250,
-  "scale": 2.9457074453355254,
+  "centerStrength": 0.433550824175824,
+  "repelStrength": 8.8907967032967,
+  "linkStrength": 0.697415865384615,
+  "linkDistance": 185,
+  "scale": 1.0442209575833967,
   "close": true
 }
