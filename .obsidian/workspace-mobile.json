@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "eng.md",
+                "file": "口语演讲/中文.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "eng"
+              "title": "中文"
             }
           }
         ]
@@ -168,7 +168,7 @@
   },
   "active": "481d10aa5db12762",
   "lastOpenFiles": [
-    "eng.md",
+    "口语演讲/eng.md",
     "未命名",
     "口语演讲/中文.md",
     "作息/作息问题.md",
