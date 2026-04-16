@@ -4,141 +4,185 @@
 
 - **基本声明：** `vector<int> v;` (空容器)
     
-- **指定大小：** `vector<int> v(n);` (创建长度为 `n` 的数组，默认初值为 0)
+- **指定大小：** `vector<int> v(n);` (创建长度为 n 的数组，默认初值为 0)
     
-- **指定大小并赋初值：** `vector<int> v(n, -1);` (长度为 `n`，全初始化为 -1)
+- **指定大小并赋初值：** `vector<int> v(n, -1);` (长度为 n，全初始化为 -1)
     
 - **复制初始化：** `vector<int> v2(v1);` (将 `v1` 的内容完整拷贝给 `v2`)
     
 - **区间初始化：** `vector<int> v(a, a + n);` (将普通数组 `a` 的前 `n` 个元素放入 vector)
     
-- **二维动态数组：** `vector<vector<int>> g(n, vector<int>(m, 0));` (创建 $n \times m$ 且初始全为 0 的矩阵)
+- **二维动态数组：** `vector<vector<int>> g(n, vector<int>(m, 0));` (创建大小为 $n \times m$ 且初始全为 0 的矩阵)
     
 
-### 2. 元素访问与状态检查 (Access & Capacity)
+---
+
+### 2. 核心操作：增、删、改、查 (CRUD)
+
+> **💡 核心认知：** `vector` 本身只提供基础的**增删**和**下标修改**。高级的**改**（如替换、批量填充）和**查**（如搜索、统计）实际上是由 `#include <algorithm>` 提供的。
+
+#### 2.1 增 (Add)
+
+- **尾部追加：** `v.push_back(x);` (时间复杂度 $O(1)$，竞赛最常用)
+    
+- **指定位置插入：** `v.insert(it, x);` (在迭代器 `it` 处插入 `x`，其后元素整体右移，时间复杂度 $O(N)$)
+    
+
+C++
+
+```
+vector<int> v = {1, 2, 8, 9};
+
+// 场景 1：插入另一个 vector 的一部分（或全部）
+vector<int> v2 = {3, 4, 5};
+// 目的：在 v[2] 的位置，插入 v2 的 [begin, end) 区间
+// v.begin() + 2 指向元素 8
+v.insert(v.begin() + 2, v2.begin(), v2.end());
+// 此时 v 变成: {1, 2, 3, 4, 5, 8, 9}
+
+// 场景 2：直接插入一个普通的 C 语言数组
+int arr[] = {6, 7};
+// 目的：将 arr 的元素插入到 v 中
+// 注意：普通数组传的是指针 (arr 和 arr + 2)
+v.insert(v.begin() + 5, arr, arr + 2);
+// 此时 v 变成: {1, 2, 3, 4, 5, 6, 7, 8, 9}
+```
+
+#### 2.2 删 (Delete)
+
+- **尾部删除：** `v.pop_back();` (删除最后一个元素，时间复杂度 $O(1)$)
+    
+- **指定位置/区间删除：** (其后元素整体左移，时间复杂度 $O(N)$)
+    
+    - `v.erase(it);` (删除迭代器 `it` 处的单个元素)
+        
+    - `v.erase(first, last);` (删除左闭右开区间 `[first, last)` 内的元素)
+        
+- **清空所有元素：** `v.clear();` (清空元素，`size` 变为 0，**但不会释放内存**，`capacity` 不变)
+    
+
+#### 2.3 改 (Update / Modify)
+
+修改操作可以细分为单点修改、区间覆盖和条件替换。
+
+- **单点修改：** `v[i] = x;` (直接通过下标覆盖，最常用)
+    
+- **推翻重推 (assign)：** 属于 `vector` 自带函数。当老数据全没用时，用新数据覆盖，容量自动调整。
+```
+    vector<int> v = {1, 2, 3, 4, 5};
+    v.assign(10, -1); // 彻底清空原数据，替换为 10 个 -1
+    
+    int arr[] = {7, 8, 9};
+    v.assign(arr, arr + 3); // 用数组的一段覆盖，v 变成 {7, 8, 9}
+```
+- **区间填充 (fill)：** `<algorithm>` 函数。常用于多组测试数据重置状态，比 `for` 循环快。
+ ```
+    vector<int> v(100, 5); 
+    // 目的：把前 10 个元素全部重置为 -1
+    fill(v.begin(), v.begin() + 10, -1);
+    
+    int arr[50];
+    // 把整个原生数组填满 0
+    fill(arr, arr + 50, 0); 
+ ```
+- **⭐ 条件替换 (replace)：** `<algorithm>` 函数。遍历区间，将所有等于旧值的元素替换为新值。
+```
+    vector<int> v = {1, 2, 3, 2, 5};
+    // 语法：replace(起点, 终点, 旧值, 新值)
+    // 目的：将 v 中所有的 2 替换为 99
+    replace(v.begin(), v.end(), 2, 99);
+    // 此时 v 变成: {1, 99, 3, 99, 5}
+```
+
+#### 2.4 查 (Query / Read)
+
+这里的查指的是寻找特定的值或子串，依赖 `<algorithm>`。
+
+- **寻找单个数字 (find)：**
+```
+    vector<int> v = {4, 1, 3, 1, 5};
+    // 找数字 1 第一次出现的位置
+    auto it = find(v.begin(), v.end(), 1); 
+    if (it != v.end()) {
+        cout << "第一次出现的位置: " << it - v.begin() << "\n";
+    }
+```
+- **寻找子数组 (search)：**
+```
+    vector<int> haystack = {1, 2, 3, 4, 5, 6, 7}; 
+    vector<int> needle = {3, 4, 5}; 
+    
+    // 核心语法：传入两对迭代器 (主数组起点, 主数组终点, 子数组起点, 子数组终点)
+    
+    auto it = search(haystack.begin(), haystack.end(), needle.begin(), needle.end()); 
+    
+    if (it != haystack.end()) { 
+        // 利用指针算术计算下标 
+        cout << "找到了！起始下标是: " << it - haystack.begin() << "\n"; // 输出 2 
+    }
+```
+- **统计出现次数 (count)：**
+```
+    vector<int> v = {1, 2, 2, 3, 2};
+    // 统计 vector 中数字 2 出现了几次
+    int cnt = count(v.begin(), v.end(), 2); // 返回 3
+```
+---
+
+### 3. 元素访问与状态检查 (Access & State)
 
 - **下标访问：** `v[i]` (最常用，不检查越界，速度最快)
     
-- **首尾元素：** `v.front()` 和 `v.back()` (返回引用，常用 `v.back()` 获取最后一个数)
+- **首尾元素：** `v.front()` 和 `v.back()` (返回引用，竞赛中极常用 `v.back()` 获取最后一个数)
     
-- **获取大小：** `v.size()` (返回 `size_t`，注意在做 `v.size() - 1` 计算时，若 size 为 0 会产生巨大的正数，建议强转 `(int)v.size()`)
+- **获取大小：** `v.size()`
     
-- **判空：** `v.empty()` (比 `v.size() == 0` 更规范)
-    
-
-### 3. 修改操作 (Modification)
-
-- **尾部增删：** `push_back(x)` 和 `pop_back()` (时间复杂度 $O(1)$，竞赛最常用)
-    
-- **插入：** `v.insert(it, x)` (在迭代器 `it` 处插入 `x`，后面元素右移，$O(N)$)
-```
-    vector<int> v = {1, 2, 8, 9};
-    
-    // 场景 1：插入另一个 vector 的一部分（或全部）
-    vector<int> v2 = {3, 4, 5};
-    // 在 v[2] 的位置，插入 v2 的 [begin, end) 区间
-    
-    v.insert(v.begin() + 2, v2.begin(), v2.end());
-    
-    // 此时 v 变成: {1, 2, 3, 4, 5, 8, 9}
-    
-    // 场景 2：直接插入一个普通的 C 语言数组
-    int arr[] = {6, 7};
-    // 注意：普通数组传的是指针 (arr 和 arr + 2)
-    
-    v.insert(v.begin() + 5, arr, arr + 2);
-    
-    // 此时 v 变成: {1, 2, 3, 4, 5, 6, 7, 8, 9}
-    
-    return 0;
-```
-    
-- **删除：**  `v.erase(it)` (删除 `it` 处的元素，$O(N)$)
-    
-    - `v.erase(first, last)` (删除区间 `[first, last)` 内的元素)
+    - _避坑指南：_ `v.size()` 返回的是无符号整型 `size_t`。如果 `v` 为空，`v.size() - 1` 会下溢出一个巨大的正数，导致段错误。建议涉及减法时强转：`(int)v.size() - 1`。
         
-- **清空：** `v.clear()` (清空所有元素，但**不会**释放内存，容量 `capacity` 不变)
+- **判空：** `v.empty()` (返回 bool 值，比 `v.size() == 0` 更规范且执行效率更稳定)
     
-- **重置：** `v.assign(n, val)` (将内容替换为 `n` 个 `val`)
+
+---
+
+### 4. 竞赛进阶语法与内存优化 (Optimization)
+
+- **空间预留：** `v.reserve(n);`
     
-- **寻找数组**
- ```
-	vector<int> haystack = {1, 2, 3, 4, 5, 6, 7}; 
-	vector<int> needle = {3, 4, 5}; 
-	// 核心语法：传入两对迭代器 
-	// search(主数组的起点, 主数组的终点, 子数组的起点, 子数组的终点)
-	
-	auto it = search(haystack.begin(), haystack.end(), needle.begin(), needle.end()); 
-	
-	// 检查是否找到了 
-	if (it != haystack.end()) 
-	{ // 利用指针算术计算下标 
-		cout << "找到了！起始下标是: " << it - haystack.begin() << "\n"; // 输出 2 
-	} 
-	else { cout << "没找到\n"; }
- ```
- - **寻找数字**
-```
-	vector<int> v = {4, 1, 3, 1, 5};
-	auto it = find(v.begin(), v.end(), 1); // 找数字 1
-	if (it != v.end()) cout << "第一次出现的位置: " << it - v.begin();
-```
- - **统计出现次数**
-```
-	int arr[] = {1, 2, 2, 3, 2};
-	// 统计数组 arr 中，数字 2 出现了几次
-	int cnt = count(arr, arr + 5, 2); // 返回 3
-```
- - **区间填充**
-
-	在处理多组测试数据（Multiple Test Cases）时，通常需要清空或重置数组。不要用 `for` 循环，用 `fill`！
-```
-	vector<int> v(100, 5); // 初始全是 5
-	// 把前 10 个元素全部重置为 -1
-	fill(v.begin(), v.begin() + 10, -1);
-	
-	int arr[50];
-	// 把整个原生数组填满 0
-	fill(arr, arr + 50, 0); 
-```
-
-- **推翻重来**
-
-	这是属于 `vector` 自带的函数（不需要 algorithm 头文件）。当你发现这个 `vector` 里面的老数据全都没用了，你想用新数据覆盖它时：
-```
-	vector<int> v = {1, 2, 3, 4, 5};
-	// 彻底清空原数据，替换为 10 个 -1
-	v.assign(10, -1); 
-	
-	// 或者用另一个数组的一段去覆盖它
-	int arr[] = {7, 8, 9};
-	v.assign(arr, arr + 3); // v 变成了 {7, 8, 9}
-```
-
-### 4. 竞赛进阶语法 (Optimization & Advanced)
-
-- **空间预留：** `v.reserve(n)`
-    
-    - **核心痛点：** `vector` 扩容时会申请双倍空间并搬运数据。如果你已知数据量，先 `reserve(n)` 可以避免多次扩容，显著减少运行时间。
+    - _核心痛点：_ `vector` 动态扩容时会申请双倍空间并把老数据搬运过去，极度消耗时间。如果你在读入数据前已知总数据量，先 `v.reserve(n)` 可以避免所有的动态扩容，显著减少运行时间。
         
-- **大小调整：** `v.resize(n, val)`
+- **大小调整：** `v.resize(n, val);`
     
-    - 改变 `size()`。如果新 `n` 比原来大，会填充 `val`；如果小，会截断。
+    - 强行改变 `size()`。如果新的 `n` 比原来大，多出来的部分会填充 `val`（默认是 0）；如果小，多余的尾部数据会被截断销毁。
         
-- **快速释放内存：** `vector<int>().swap(v);` (利用一个临时的空 vector 与 `v` 交换，彻底释放 `v` 占用的内存。在内存限制极严的题目中处理大型全局变量时有用)
+- **快速释放内存：** `vector<int>().swap(v);`
     
+    - _原理：_ `v.clear()` 只清空数据，不释放物理内存。利用一个临时的空 vector 与 `v` 交换，临时变量销毁时会把 `v` 原来的庞大内存带走。在内存限制极严（如 64MB）的题目中处理大型全局变量时非常有用。
+        
 
-### 5. 配合 STL 算法 (The "Magic" of STL)
+---
 
-`vector` 的强大在于它是很多算法的载体：
+### 5. 配合 STL 算法神技 (The "Magic" of STL)
 
-- **排序：** `sort(v.begin(), v.end());`
+`vector` 是内存连续的容器，能将 `<algorithm>` 的威力发挥到极致（底层可以使用随机访问迭代器）。
+
+- **排序：** `sort(v.begin(), v.end());` (默认升序，时间复杂度 $O(N \log N)$)
     
-- **去重：** ```sort(v.begin(), v.end());
+- **反转：** `reverse(v.begin(), v.end());` (将区间内的元素倒序)
     
-	 v.erase(unique(v.begin(), v.end()), v.end());
+- **经典去重操作 (离散化必备)：**
     
-- **查找：** 
-	`lower_bound(v.begin(), v.end(), x)` (返回第一个 $\ge x$ 的迭代器)
-	`upper_bound()`第一个<=的迭代器	
-- **反转：** `reverse(v.begin(), v.end());`
+    C++
+    
+    ```
+    // 第一步：必须先排序，将相同元素聚集到一起
+    sort(v.begin(), v.end());
+    // 第二步：unique 会将重复元素移到末尾，并返回去重后有效数组的尾迭代器
+    // 第三步：用 erase 真正删掉末尾的那些废弃重复元素
+    v.erase(unique(v.begin(), v.end()), v.end());
+    ```
+    
+- **二分查找：** (⚠️ _纠正了你原笔记中的错误_)
+    
+    - `lower_bound(v.begin(), v.end(), x)`：返回第一个 **大于等于 ( $\ge$ )** `x` 的迭代器。
+        
+    - `upper_bound(v.begin(), v.end(), x)`：返回第一个 **严格大于 ( $>$ )** `x` 的迭代器。（_注意：绝不是小于等于！如果是查找最后一个小于等于的数，通常用 `upper_bound` 的结果减去 1 得到_）。
